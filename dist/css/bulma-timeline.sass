@@ -1,3 +1,12 @@
+@use "bulma/sass/utilities" as utils
+
+// external overridable bulma variables
+$colors: utils.$colors !default
+$grey-lighter: utils.$grey-lighter !default
+$white: utils.$white !default
+$weight-semibold: utils.$weight-semibold !default
+
+// extension variables
 $timeline-marker-size: 12px !default
 $timeline-marker-color: $grey-lighter !default
 $timeline-marker-icon-size: 24px !default
@@ -14,6 +23,10 @@ $timeline-header-width: 4em !default
 $timeline-item-padding-left: $timeline-header-width * 0.5 !default
 $timeline-item-padding-bottom: 2em !default
 $dimensions: 16 24 32 48 64 96 128 !default
+
+// internal variables
+$color: null
+$color-invert: null
 
 .timeline
   display: flex
@@ -55,15 +68,15 @@ $dimensions: 16 24 32 48 64 96 128 !default
       top: 1.2rem
       width: $timeline-marker-size
       &.is-image
-        @each $dimension in $dimensions
-          &.is-#{$dimension}x#{$dimension}
-            height: $dimension * 1px
-            width: $dimension * 1px
         background: $timeline-marker-color
         border: $timeline-marker-border
         border-radius: 100%
         display: block
         overflow: hidden
+        @each $dimension in $dimensions
+          &.is-#{$dimension}x#{$dimension}
+            height: $dimension * 1px
+            width: $dimension * 1px
       &.is-icon
         display: flex
         align-items: center
@@ -84,8 +97,12 @@ $dimensions: 16 24 32 48 64 96 128 !default
           > *
             color: $timeline-marker-color
       @each $name, $pair in $colors
-        $color: nth($pair, 1)
-        $color-invert: nth($pair, 2)
+        @if type-of($pair) == "list"
+          $color: nth($pair, 1) !global
+          $color-invert: nth($pair, 2) !global
+        @else
+          $color: $pair !global
+          $color-invert: utils.bulmaFindColorInvert($pair) !global
         &.is-#{$name}
           background-color: $color !important
           border-color: $color !important
@@ -112,8 +129,12 @@ $dimensions: 16 24 32 48 64 96 128 !default
         font-weight: $weight-semibold
 
     @each $name, $pair in $colors
-      $color: nth($pair, 1)
-      $color-invert: nth($pair, 2)
+      @if type-of($pair) == "list"
+        $color: nth($pair, 1) !global
+        $color-invert: nth($pair, 2) !global
+      @else
+        $color: $pair !global
+        $color-invert: utils.bulmaFindColorInvert($pair) !global
       &.is-#{$name}
         &::before
           background-color: $color
@@ -154,8 +175,12 @@ $dimensions: 16 24 32 48 64 96 128 !default
           position: absolute
           top: 0
       @each $name, $pair in $colors
-        $color: nth($pair, 1)
-        $color-invert: nth($pair, 2)
+        @if type-of($pair) == "list"
+          $color: nth($pair, 1) !global
+          $color-invert: nth($pair, 2) !global
+        @else
+          $color: $pair !global
+          $color-invert: utils.bulmaFindColorInvert($pair) !global
         &.is-#{$name}
           &::before
             background-color: $color
@@ -167,11 +192,11 @@ $dimensions: 16 24 32 48 64 96 128 !default
       justify-content: flex-end
       flex-direction: row
       border-left: none
+      margin-left: 0
+      margin-right: $timeline-header-width * 0.5
       &::before
         right: 0
         left: auto
-      margin-left: 0
-      margin-right: $timeline-header-width * 0.5
       .timeline-marker
         transform: translateX(50%)
         &.is-image
